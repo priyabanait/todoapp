@@ -1,57 +1,43 @@
-import React, { useState } from 'react'
+import Head from 'next/head'
+import Image from 'next/image'
+import { Inter } from 'next/font/google'
+import styles from '@/styles/Home.module.css'
+import React, {useState} from 'react'
+import Axios from 'axios'
 
-export default function ToDoList() {
-    const [enterActivity , setEnterActivity]=useState('');
-    const[listData, setListData]=useState([]);
+const inter = Inter({ subsets: ['latin'] })
 
-    function onActivityhandler(event){
-        setEnterActivity(event.target.value)
+export default function Home() {
+  const [title, setTitle] = useState('')
+  const [todo, setTodo] = useState('')
+
+  const handleSubmit = () =>{
+    const todoObj = {
+      title: title,
+      todo: todo
     }
-    function listHandler(){
-        setListData((listData)=>{
-  const list=[...listData,enterActivity];
-  setListData(list)
-  return list;
- 
-        })
-       setEnterActivity('')  
-    }
-   
-        
-    
-    function RemoveData(i){
-       const list=listData.filter((elem, id)=>{
-        return i!==id;
-       })
-       setListData(list)
-    }
-    function removeAll(){
-        setListData([])
-    }
+    console.log(todoObj)
+    Axios.post('/api/newTodo', todoObj)
+    .then(()=>{
+      alert('Todo added')
+    })
+  }
   return (
-    <div>
+    <>
       <div className='container'>
-        <div className='input header'>
-            <h2>ToDo List</h2>
-        <input type='text' placeholder='Enter Activity' onChange={onActivityhandler} 
-        value={enterActivity}></input>
-        <button className='button' onClick={listHandler}>Add</button>
-        </div>
-        { listData.map((data, index)=>{
-            return(
-                <ul key={index} >
-                    <li className='li'>
-                   
-                    <input type='checkbox' className='check'></input>
-                        <p className='listData'>{data}</p>
-                        <button className='btn-position' onClick={()=>RemoveData(index)}>Remove</button>
-                   </li>
-                </ul>
-            )
-        })}
-
-      {listData.length>=1 && <button onClick={removeAll}>Remove All</button>}
+        <h1>Create Todo</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label for="title" className="form-label">Title</label>
+            <input type="text" className="form-control" id="title" aria-describedby="emailHelp" onChange={(event)=>setTitle(event.target.value)}/>          
+          </div>
+          <div className="mb-3">
+            <label for="todo" className="form-label">Todo</label>
+            <input type="text" className="form-control" id="todo" aria-describedby="emailHelp" onChange={(event)=>setTodo(event.target.value)}/>          
+          </div>
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </form>
       </div>
-    </div>
+    </>
   )
 }
